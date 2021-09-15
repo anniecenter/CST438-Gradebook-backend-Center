@@ -41,7 +41,7 @@ public class GradeBookController {
 	CourseRepository courseRepository;
 	
 	@Autowired
-	RegistrationService registrationService;
+	RegistrationService registrationService; //
 	
 	// get assignments for an instructor that need grading
 	@GetMapping("/gradebook")
