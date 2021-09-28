@@ -17,6 +17,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import com.cst438.controllers.GradeBookController;
 import com.cst438.domain.Assignment;
 import com.cst438.domain.AssignmentGrade;
@@ -241,6 +245,74 @@ public class JunitTestGradebook {
 		verify(assignmentGradeRepository, times(1)).save(updatedag);
 	}
 
+	@Test
+	public void addAssignment() throws Exception {
+	   MockHttpServletResponse response;
+	   
+	   Course course = new Course();
+      course.setCourse_id(TEST_COURSE_ID);
+      course.setSemester(TEST_SEMESTER);
+      course.setYear(TEST_YEAR);
+      course.setInstructor(TEST_INSTRUCTOR_EMAIL);
+      course.setEnrollments(new java.util.ArrayList<Enrollment>());
+      course.setAssignments(new java.util.ArrayList<Assignment>());
+	   
+      Assignment expected = new Assignment();
+      expected.setName("assignment1");
+      
+      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+      Date date = dateFormat.parse("2021-09-24");
+      expected.setDueDate(new java.sql.Date(date.getTime()));
+      expected.setCourse(course);
+      expected.setNeedsGrading(1);
+      
+	   given(courseRepository.findByCourse_id(TEST_COURSE_ID)).willReturn(course);
+	   
+	   response = mvc.perform(MockMvcRequestBuilders.post("/assignment?id="+ TEST_COURSE_ID + "&name=assignment1&due_date=2021-09-24").accept(MediaType.APPLICATION_JSON))
+            .andReturn().getResponse();
+	   
+	   assertEquals(200, response.getStatus());
+	   
+	   verify(assignmentRepository, times(1)).save(expected);
+	}
+	
+	@Test
+	public void changeName() throws Exception {
+	   MockHttpServletResponse response;
+      
+	   Assignment assignment = new Assignment();
+	   assignment.setName("Assignment1");
+	   
+      Assignment expected = new Assignment();
+      expected.setName("Assignment1");
+      
+      given(assignmentRepository.findById(TEST_COURSE_ID)).willReturn(assignment);
+      
+      response = mvc.perform(MockMvcRequestBuilders.put("/assignment/"+ TEST_COURSE_ID + "?name=Assignment1").accept(MediaType.APPLICATION_JSON))
+            .andReturn().getResponse();
+      
+      assertEquals(200, response.getStatus());
+      
+      verify(assignmentRepository, times(1)).save(expected);
+	}
+	
+	@Test
+	public void deleteAssignment() throws Exception {
+	   MockHttpServletResponse response;
+      
+      Assignment assignment = new Assignment();
+      assignment.setName("Assignment1");
+      
+      given(assignmentRepository.findById(TEST_COURSE_ID)).willReturn(assignment);
+      
+      response = mvc.perform(MockMvcRequestBuilders.delete("/assignment/"+ TEST_COURSE_ID).accept(MediaType.APPLICATION_JSON))
+            .andReturn().getResponse();
+      
+      assertEquals(200, response.getStatus());
+      
+      verify(assignmentRepository, times(1)).delete(assignment);
+	}
+	
 	private static String asJsonString(final Object obj) {
 		try {
 
