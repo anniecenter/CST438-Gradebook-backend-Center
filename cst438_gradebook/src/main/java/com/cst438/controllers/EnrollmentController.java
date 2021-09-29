@@ -30,11 +30,17 @@ public class EnrollmentController {
 	@PostMapping("/enrollment")
 	@Transactional
 	public EnrollmentDTO addEnrollment(@RequestBody EnrollmentDTO enrollmentDTO) {
+	 //TODO  complete this method in homework 4
+	   Course course = courseRepository.findByCourse_id(enrollmentDTO.course_id);
+	   
+	   Enrollment enrollment = new Enrollment();
+	   enrollment.setStudentName(enrollmentDTO.studentName);
+	   enrollment.setStudentEmail(enrollmentDTO.studentEmail);
+	   enrollment.setCourse(course);
+	   
+	   Enrollment newEnrollment = enrollmentRepository.save(enrollment);
 		
-		//TODO  complete this method in homework 4
-		
-		return null;
-		
+		return new EnrollmentDTO(newEnrollment);
 	}
 
 }
